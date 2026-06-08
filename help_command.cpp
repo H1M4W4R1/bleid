@@ -9,7 +9,7 @@ void print_help(const char *program)
     std::cout
         << "Usage:\n"
         << "  " << program << " uuid [device-name] [options]\n"
-        << "  " << program << " reserve [--check] <name>\n"
+        << "  " << program << " reserve [--check] [uuid-options] <name>\n"
         << "  " << program << " reserve --list\n"
         << "  " << program << " free <name>\n"
         << "  " << program << " help\n"
@@ -45,11 +45,16 @@ void print_reserve_help(const char *program)
 {
     std::cout
         << "Usage:\n"
-        << "  " << program << " reserve [--check] <name>\n"
+        << "  " << program << " reserve [--check] [uuid-options] <name>\n"
         << "  " << program << " reserve --list\n"
         << "\n"
         << "Options:\n"
-        << "  --check, -c   Check whether the name is reserved without changing it.\n"
+        << "  --check, -c   Check whether the name or generated UUID is already reserved.\n"
+        << "  --base, -b    Base UUID template used for collision detection.\n"
+        << "  --service     Service index used for collision detection (0..0xfff).\n"
+        << "  --characteristic\n"
+        << "               Characteristic index used for collision detection (0..0xffff).\n"
+        << "  --descriptor  Descriptor index used for collision detection (0..0xfff).\n"
         << "  --list, -l    List all reserved names.\n"
         << "  --help, -h    Show reserve command help.\n";
 }

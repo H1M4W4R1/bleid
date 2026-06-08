@@ -39,6 +39,28 @@ Hexadecimal values are supported with a `0x` prefix:
 bleid.exe uuid "my device" --service 0x10 --characteristic 0x20
 ```
 
+With a custom base UUID template:
+
+```powershell
+bleid.exe uuid "my device" --base "ae615XXX-XXXX-4XXX-8000-XXXXXXXXXXXX" --service 1 --characteristic 2 --descriptor 3
+```
+
+Placeholder layout:
+
+```text
+ae615[SVC]-[CHAR]-4[DESC]-8000-[NAME_HASH]
+     XXX   XXXX    XXX        XXXXXXXXXXXX
+```
+
+For example, the command above fills:
+
+```text
+SVC       -> 001
+CHAR      -> 0002
+DESC      -> 003
+NAME_HASH -> generated from "my device"
+```
+
 Available UUID options:
 
 ```text
@@ -66,6 +88,16 @@ Check a name:
 ```powershell
 bleid.exe reserve --check "my device"
 ```
+
+The check also detects UUID collisions against already-reserved names. This matters because different names can produce the same generated UUID suffix.
+
+Use the same UUID options as generation when checking a specific UUID space:
+
+```powershell
+bleid.exe reserve --check "my device" --base "ae615XXX-XXXX-4XXX-8000-XXXXXXXXXXXX" --service 1 --characteristic 2 --descriptor 3
+```
+
+If the name is not reserved but its generated UUID collides with another reserved name, the command reports the colliding reserved name and UUID.
 
 List all reserved names:
 
