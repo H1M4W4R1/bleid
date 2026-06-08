@@ -22,7 +22,7 @@ void print_help(const char *program)
         << "\n"
         << "Reservation file:\n"
         << "  " << default_reservation_path() << "\n"
-        << "  Override with GEN_UUID_RESERVATIONS.\n";
+        << "  Override with BLEID_RESERVATIONS.\n";
 }
 
 void print_uuid_help(const char *program)

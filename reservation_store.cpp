@@ -65,14 +65,14 @@ std::string storage_directory()
 
 bool uses_override_path()
 {
-    const char *override_path = std::getenv("GEN_UUID_RESERVATIONS");
+    const char *override_path = std::getenv("BLEID_RESERVATIONS");
     return override_path != 0 && override_path[0] != '\0';
 }
 }
 
 std::string default_reservation_path()
 {
-    const char *override_path = std::getenv("GEN_UUID_RESERVATIONS");
+    const char *override_path = std::getenv("BLEID_RESERVATIONS");
     if (override_path != 0 && override_path[0] != '\0')
     {
         return override_path;
