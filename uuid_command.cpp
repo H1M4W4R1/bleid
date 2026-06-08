@@ -1,11 +1,55 @@
 #include "uuid_command.h"
 #include "help_command.h"
+#include "reservation_store.h"
 #include "uuid_generator.h"
 
 #include <exception>
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <vector>
+
+namespace
+{
+std::string reservation_collision_message(const std::string &uuid,
+                                          const std::string &phrase,
+                                          const std::string &base,
+                                          bool has_service,
+                                          unsigned int service,
+                                          bool has_characteristic,
+                                          unsigned int characteristic,
+                                          bool has_descriptor,
+                                          unsigned int descriptor)
+{
+    ReservationStore store;
+    const std::vector<std::string> reserved_names = store.names();
+
+    for (std::vector<std::string>::const_iterator it = reserved_names.begin(); it != reserved_names.end(); ++it)
+    {
+        const std::string reserved_uuid = generate_uuid(base,
+                                                        *it,
+                                                        has_service,
+                                                        service,
+                                                        has_characteristic,
+                                                        characteristic,
+                                                        has_descriptor,
+                                                        descriptor);
+        if (reserved_uuid != uuid)
+        {
+            continue;
+        }
+
+        if (*it == phrase)
+        {
+            return uuid + ", already reserved";
+        }
+
+        return uuid + ", collides with " + *it;
+    }
+
+    return uuid;
+}
+}
 
 int run_uuid_command(const char *program, int argc, char *argv[])
 {
@@ -86,14 +130,23 @@ int run_uuid_command(const char *program, int argc, char *argv[])
             }
         }
 
-        std::cout << generate_uuid(base,
-                                   phrase,
-                                   has_service,
-                                   service,
-                                   has_characteristic,
-                                   characteristic,
-                                   has_descriptor,
-                                   descriptor)
+        const std::string uuid = generate_uuid(base,
+                                               phrase,
+                                               has_service,
+                                               service,
+                                               has_characteristic,
+                                               characteristic,
+                                               has_descriptor,
+                                               descriptor);
+        std::cout << reservation_collision_message(uuid,
+                                                   phrase,
+                                                   base,
+                                                   has_service,
+                                                   service,
+                                                   has_characteristic,
+                                                   characteristic,
+                                                   has_descriptor,
+                                                   descriptor)
                   << std::endl;
         return 0;
     }

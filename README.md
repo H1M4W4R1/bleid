@@ -61,6 +61,18 @@ DESC      -> 003
 NAME_HASH -> generated from "my device"
 ```
 
+If the generated UUID matches a reserved name, `uuid` annotates the output:
+
+```text
+[GENERATED_UUID], already reserved
+```
+
+If it matches a different reserved name, it prints:
+
+```text
+[GENERATED_UUID], collides with [RESERVED_NAME]
+```
+
 Available UUID options:
 
 ```text
