@@ -3,6 +3,7 @@
 #include "reservation_store.h"
 #include "uuid_generator.h"
 
+#include <cctype>
 #include <exception>
 #include <iostream>
 #include <stdexcept>
@@ -11,6 +12,34 @@
 
 namespace
 {
+bool is_template_char(char c)
+{
+    const char upper = static_cast<char>(std::toupper(static_cast<unsigned char>(c)));
+    return std::isxdigit(static_cast<unsigned char>(c)) != 0 ||
+           upper == 'S' ||
+           upper == 'T' ||
+           upper == 'R' ||
+           upper == 'X' ||
+           c == '-';
+}
+
+bool looks_like_uuid_template(const std::string &value)
+{
+    int hyphens = 0;
+    for (std::string::size_type i = 0; i < value.size(); ++i)
+    {
+        if (value[i] == '-')
+        {
+            ++hyphens;
+        }
+        if (!is_template_char(value[i]))
+        {
+            return false;
+        }
+    }
+    return hyphens == 4;
+}
+
 std::string reservation_collision_message(const std::string &uuid,
                                           const std::string &phrase,
                                           const std::string &base,
@@ -58,6 +87,7 @@ int run_uuid_command(const char *program, int argc, char *argv[])
     bool has_service = false;
     bool has_characteristic = false;
     bool has_descriptor = false;
+    bool base_was_set = false;
     unsigned int service = 0;
     unsigned int characteristic = 0;
     unsigned int descriptor = 0;
@@ -80,6 +110,7 @@ int run_uuid_command(const char *program, int argc, char *argv[])
                     throw std::runtime_error("--base requires a UUID value");
                 }
                 base = argv[i];
+                base_was_set = true;
             }
             else if (arg == "--service" || arg == "--svc")
             {
@@ -87,7 +118,7 @@ int run_uuid_command(const char *program, int argc, char *argv[])
                 {
                     throw std::runtime_error(arg + " requires a value");
                 }
-                service = static_cast<unsigned int>(parse_unsigned(argv[i], 0xFFFULL, "service"));
+                service = static_cast<unsigned int>(parse_unsigned(argv[i], 0xFFFFFFFFULL, "service"));
                 has_service = true;
             }
             else if (arg == "--characteristic" || arg == "--char")
@@ -96,7 +127,7 @@ int run_uuid_command(const char *program, int argc, char *argv[])
                 {
                     throw std::runtime_error(arg + " requires a value");
                 }
-                characteristic = static_cast<unsigned int>(parse_unsigned(argv[i], 0xFFFFULL, "characteristic"));
+                characteristic = static_cast<unsigned int>(parse_unsigned(argv[i], 0xFFFFFFFFULL, "characteristic"));
                 has_characteristic = true;
             }
             else if (arg == "--descriptor" || arg == "--desc")
@@ -105,7 +136,7 @@ int run_uuid_command(const char *program, int argc, char *argv[])
                 {
                     throw std::runtime_error(arg + " requires a value");
                 }
-                descriptor = static_cast<unsigned int>(parse_unsigned(argv[i], 0xFFFULL, "descriptor"));
+                descriptor = static_cast<unsigned int>(parse_unsigned(argv[i], 0xFFFFFFFFULL, "descriptor"));
                 has_descriptor = true;
             }
             else if (arg == "--name" || arg == "-n" || arg == "--phrase")
@@ -122,6 +153,13 @@ int run_uuid_command(const char *program, int argc, char *argv[])
             }
             else
             {
+                if (!base_was_set && phrase.empty() && looks_like_uuid_template(arg))
+                {
+                    base = arg;
+                    base_was_set = true;
+                    continue;
+                }
+
                 if (!phrase.empty())
                 {
                     phrase += " ";

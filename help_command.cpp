@@ -28,15 +28,18 @@ void print_help(const char *program)
 void print_uuid_help(const char *program)
 {
     std::cout
-        << "Usage: " << program << " uuid [device-name] [--base UUID] [--service N] [--characteristic N] [--descriptor N] [--name TEXT]\n"
+        << "Usage: " << program << " uuid [base-template] [device-name] [--base UUID] [--service N] [--characteristic N] [--descriptor N] [--name TEXT]\n"
         << "\n"
         << "Options:\n"
         << "  --base, -b    Base UUID template. Default: " << DEFAULT_BASE_UUID << "\n"
-        << "               Layout: ae615[SVC_IDX]-[CHAR_IDX]-4[DESC_IDX]-8000-[XXXXXXXXXXXX]\n"
-        << "  --service     Service index as decimal or 0x-prefixed hexadecimal (0..0xfff).\n"
+        << "               A UUID-looking first positional argument can also be used as the base.\n"
+        << "               Placeholders: S=service, T=characteristic, R=descriptor, X=hash.\n"
+        << "               Placeholder matching is case-insensitive.\n"
+        << "               Width is the total count of each placeholder in the base.\n"
+        << "  --service     Service index as decimal or 0x-prefixed hexadecimal.\n"
         << "  --characteristic\n"
-        << "               Characteristic index as decimal or 0x-prefixed hexadecimal (0..0xffff).\n"
-        << "  --descriptor  Descriptor index as decimal or 0x-prefixed hexadecimal (0..0xfff).\n"
+        << "               Characteristic index as decimal or 0x-prefixed hexadecimal.\n"
+        << "  --descriptor  Descriptor index as decimal or 0x-prefixed hexadecimal.\n"
         << "  --name, -n    Device name/phrase. A positional value can be used instead.\n"
         << "  --help, -h    Show UUID command help.\n";
 }
@@ -51,10 +54,10 @@ void print_reserve_help(const char *program)
         << "Options:\n"
         << "  --check, -c   Check whether the name or generated UUID is already reserved.\n"
         << "  --base, -b    Base UUID template used for collision detection.\n"
-        << "  --service     Service index used for collision detection (0..0xfff).\n"
+        << "  --service     Service index used for collision detection.\n"
         << "  --characteristic\n"
-        << "               Characteristic index used for collision detection (0..0xffff).\n"
-        << "  --descriptor  Descriptor index used for collision detection (0..0xfff).\n"
+        << "               Characteristic index used for collision detection.\n"
+        << "  --descriptor  Descriptor index used for collision detection.\n"
         << "  --list, -l    List all reserved names.\n"
         << "  --help, -h    Show reserve command help.\n";
 }

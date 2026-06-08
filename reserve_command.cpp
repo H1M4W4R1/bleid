@@ -142,7 +142,7 @@ int run_reserve_command(const char *program, int argc, char *argv[])
                 {
                     throw std::runtime_error(arg + " requires a value");
                 }
-                uuid_options.service = static_cast<unsigned int>(parse_unsigned(argv[i], 0xFFFULL, "service"));
+                uuid_options.service = static_cast<unsigned int>(parse_unsigned(argv[i], 0xFFFFFFFFULL, "service"));
                 uuid_options.has_service = true;
                 has_uuid_options = true;
                 continue;
@@ -153,7 +153,7 @@ int run_reserve_command(const char *program, int argc, char *argv[])
                 {
                     throw std::runtime_error(arg + " requires a value");
                 }
-                uuid_options.characteristic = static_cast<unsigned int>(parse_unsigned(argv[i], 0xFFFFULL, "characteristic"));
+                uuid_options.characteristic = static_cast<unsigned int>(parse_unsigned(argv[i], 0xFFFFFFFFULL, "characteristic"));
                 uuid_options.has_characteristic = true;
                 has_uuid_options = true;
                 continue;
@@ -164,7 +164,7 @@ int run_reserve_command(const char *program, int argc, char *argv[])
                 {
                     throw std::runtime_error(arg + " requires a value");
                 }
-                uuid_options.descriptor = static_cast<unsigned int>(parse_unsigned(argv[i], 0xFFFULL, "descriptor"));
+                uuid_options.descriptor = static_cast<unsigned int>(parse_unsigned(argv[i], 0xFFFFFFFFULL, "descriptor"));
                 uuid_options.has_descriptor = true;
                 has_uuid_options = true;
                 continue;

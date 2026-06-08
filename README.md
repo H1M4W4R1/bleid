@@ -2,19 +2,19 @@
 
 A small command-line helper for generating deterministic UUIDs from device names and managing a persistent list of reserved names.
 
-The default UUID layout is:
+The default base UUID template is:
 
 ```text
-ae615000-0000-4000-8000-XXXXXXXXXXXX
+ae615SSS-TTTT-4RRR-8000-XXXXXXXXXXXX
 ```
 
-The last 12 hex digits are derived from the provided name or phrase. Optional service, characteristic, and descriptor indexes can be placed into the UUID template.
+`S`, `T`, `R`, and `X` are placeholders for service, characteristic, descriptor, and generated hash values. Placeholder matching is case-insensitive. If service, characteristic, or descriptor values are not provided, their placeholders are filled with zeroes.
 
 ## Usage
 
 ```powershell
 bleid.exe help
-bleid.exe uuid [device-name] [options]
+bleid.exe uuid [base-template] [device-name] [options]
 bleid.exe reserve <name>
 bleid.exe reserve --check <name>
 bleid.exe reserve --list
@@ -42,24 +42,32 @@ bleid.exe uuid "my device" --service 0x10 --characteristic 0x20
 With a custom base UUID template:
 
 ```powershell
-bleid.exe uuid "my device" --base "ae615XXX-XXXX-4XXX-8000-XXXXXXXXXXXX" --service 1 --characteristic 2 --descriptor 3
+bleid.exe uuid "my device" --base "ae615SSS-TTTT-4RRR-8000-XXXXXXXXXXXX" --service 1 --characteristic 2 --descriptor 3
+```
+
+The base can also be provided as the first positional argument:
+
+```powershell
+bleid.exe uuid "ae615SSS-TTTT-4RRR-8000-XXXXXXXXXXXX" "my device" --service 1 --characteristic 2 --descriptor 3
 ```
 
 Placeholder layout:
 
 ```text
-ae615[SVC]-[CHAR]-4[DESC]-8000-[NAME_HASH]
-     XXX   XXXX    XXX        XXXXXXXXXXXX
+ae615[SSS]-[TTTT]-4[RRR]-8000-[XXXXXXXXXXXX]
+     SSS   TTTT    RRR        XXXXXXXXXXXX
 ```
 
 For example, the command above fills:
 
 ```text
-SVC       -> 001
-CHAR      -> 0002
-DESC      -> 003
-NAME_HASH -> generated from "my device"
+SSS          -> 001
+TTTT         -> 0002
+RRR          -> 003
+XXXXXXXXXXXX -> generated from "my device"
 ```
+
+Placeholder characters do not need to appear in only one spot. The total count of each placeholder controls that value's width, and matching positions are filled from left to right across the whole template.
 
 If the generated UUID matches a reserved name, `uuid` annotates the output:
 
@@ -77,11 +85,11 @@ Available UUID options:
 
 ```text
 --base, -b           Base UUID template
---service, --svc     Service index, 0..0xfff
+--service, --svc     Service index
 --characteristic,
---char               Characteristic index, 0..0xffff
+--char               Characteristic index
 --descriptor,
---desc               Descriptor index, 0..0xfff
+--desc               Descriptor index
 --name, -n,
 --phrase             Device name or phrase
 --help, -h           Show UUID command help
@@ -106,7 +114,7 @@ The check also detects UUID collisions against already-reserved names. This matt
 Use the same UUID options as generation when checking a specific UUID space:
 
 ```powershell
-bleid.exe reserve --check "my device" --base "ae615XXX-XXXX-4XXX-8000-XXXXXXXXXXXX" --service 1 --characteristic 2 --descriptor 3
+bleid.exe reserve --check "my device" --base "ae615SSS-TTTT-4RRR-8000-XXXXXXXXXXXX" --service 1 --characteristic 2 --descriptor 3
 ```
 
 If the name is not reserved but its generated UUID collides with another reserved name, the command reports the colliding reserved name and UUID.
